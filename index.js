@@ -22,12 +22,17 @@ app.get('/messages',(req,res)=>{
   res.send(messages);
 })
 app.post('/messages',async (req,res)=>{
-  var message = new Message(req.body)
-  var savedMessage = await message.save();
 
-  console.log("saved");
+  try {
+    throw 'some error'
 
-  var censored = await Message.findOne({message:'gaurav'})
+    var message = new Message(req.body)
+
+    var savedMessage = await message.save();
+
+    console.log("saved");
+
+    var censored = await Message.findOne({message:'gaurav'})
 
     if (censored)
       await Message.remove({_id:censored.id})
@@ -36,11 +41,11 @@ app.post('/messages',async (req,res)=>{
       io.emit('message',req.body);
 
     res.sendStatus(200);
+  } catch (error) {
+    res.sendStatus(500);
+    return console.error(error);
 
-  // .catch((err)=>{
-  //   sendStatus(500);
-  //   return console.error(err);
-  // })
+  }
 
 })
 
