@@ -1,0 +1,46 @@
+<! doctype html>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="/socket.io/socket.io.js"></script>
+<div class = "container">
+  <div class="jumbotron">
+    <br>
+    <h1 class="dispaly-4">Message</h1>
+      <br>
+      <input id="name" class="form-control" placeholder="name">
+      <br>
+      <textarea id="message" class="form-control" placeholder="Message"></textarea>
+      <br>
+
+      <button id="send" class="btn btn-success">Send</button>
+  </div>
+  <div id="messagedata">
+  </div>
+
+</div>
+<script>
+var socket = io();
+$(()=>{
+  $('#send').click(()=>{
+    var messages = {name:$("#name").val(),message:$("#message").val()};
+    postMessage(messages);
+    getMessage();
+    })
+})
+socket.on('message',addMessage)
+function addMessage(message){
+  $('#messagedata').append(`<h4> ${message.name}</h4> <p> ${message.message}`);
+}
+
+function getMessage(){
+  $.get('http://localhost:8050/messages',(data)=>{
+    data.forEach(addMessage);
+  })
+}
+
+function postMessage(messages){
+  $.post('http://localhost:8050/messages',messages);
+}
+</script>
