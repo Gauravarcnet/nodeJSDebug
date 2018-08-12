@@ -21,7 +21,7 @@
 
 </div>
 <script>
-var socket = io();
+var io = io();
 $(()=>{
   $('#send').click(()=>{
     var messages = {name:$("#name").val(),message:$("#message").val()};
@@ -29,7 +29,7 @@ $(()=>{
     getMessage();
     })
 })
-socket.on('message',addMessage)
+io.on('message',addMessage)
 function addMessage(message){
   $('#messagedata').append(`<h4> ${message.name}</h4> <p> ${message.message}`);
 }

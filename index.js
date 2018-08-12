@@ -8,14 +8,12 @@ app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : false}));
 const mongoose = require('mongoose');
+mongoose.Promise = Promise;
 var dbUrl = 'mongodb://localhost:27017/learning';
 var Message = mongoose.model('Message',{
   name:String,
   message:String
 })
-
-
-
 var messages=[
 
 ];
@@ -23,19 +21,29 @@ var messages=[
 app.get('/messages',(req,res)=>{
   res.send(messages);
 })
-app.post('/messages',(req,res)=>{
+app.post('/messages',async (req,res)=>{
   var message = new Message(req.body)
-  message.save((err)=>{
-    if(err)
-      sendStatus(500)
+  var savedMessage = await message.save();
 
+  console.log("saved");
 
-      messages.push(req.body);
+  var censored = await Message.findOne({message:'gaurav'})
+
+    if (censored)
+      await Message.remove({_id:censored.id})
+
+    else
       io.emit('message',req.body);
-      res.sendStatus(200);
-  })
+
+    res.sendStatus(200);
+
+  // .catch((err)=>{
+  //   sendStatus(500);
+  //   return console.error(err);
+  // })
 
 })
+
 io.on('connection',(socket)=>{
   console.log("New User Connected");
 })
